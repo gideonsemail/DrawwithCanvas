@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+
+<canvas id="draw" width="800" height="800"></canvas>
+
+<script>
+
+let canvas = document.querySelector("#draw")
+//we dont actually draw on the canvas element itself. We draw on something called te context(variable we're calling it is "ctx").Can be 2d or 3d (for videogames and such)
+let ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+//the below is the styling for the draing. "linejoin, lineCap, lieWidth " can ll be looked up on MDN, changed etc..teyre just standard syntx styling.
+ctx.strokeStyle = "#abd720"
+ctx.lineJoin = "round"
+ctx.lineCap = "round"
+ctx.lineWidth = 20;
+
+//our intial ariables
+let isDrawing = false
+let lastX = 0
+let lastY = 0
+//updated with mother effing hsl styles below to add color variation.
+let hue = 0;
+let direction = true;
+
+function draw(e) {
+  if(!isDrawing) return //will stop the function from running when theyre not mousedown;
+  console.log(e);
+  //updating strokeStyle for hsl
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`
+  //change linewidth and randomize s=it
+  ctx.beginPath();
+  //start from
+  ctx.moveTo(lastX, lastY)
+  //goto
+  ctx.lineTo(e.offsetX, e.offsetY)
+  //all the above just starts our line, but we wont actually see anyhting until we call "stroke" below.
+  ctx.stroke();
+  //lastX = e.offsetX
+  //lastY = e.offsetY
+  //the above 2 lines can be done vias es6 destructuring an array with the below.
+  [lastX, lastY] = [e.offsetX, e.offsetY]
+  //have the hue increment so 2nd, 3rd, 4th time we draw it changes
+  hue++
+  if(hue >= 360) {
+    hue = 0;
+  }
+  //lineWidth logi down here below
+  if(ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+    //when line gets too big flip the direction.
+    direction = !direction
+  }
+  if(direction) {
+    ctx.lineWidth++
+  } else {
+  ctx.lineWidth--
+}
+
+ }
+
+
+//logic for when we should be draing below, not when outside the window, not when mouse isnt down etc...
+canvas.addEventListener("mousedown", (e) => {
+  isDrawing = true;//you actually need the ";" here to work.
+  //as soon as the person clicks mousedown, we need to update the position so that we dont always start/stop from the same place(0, and 0)
+  [lastX, lastY] = [e.offsetX, e.offsetY]
+});
+
+
+
+canvas.addEventListener("mousemove", draw)
+canvas.addEventListener("mouseup" , () => isDrawing = false)
+canvas.addEventListener("mouseout", () => isDrawing = false)
+
+
+</script>
+
+<style>
+  html, body {
+    margin:0;
+  }
+</style>
+
+</body>
+</html>
